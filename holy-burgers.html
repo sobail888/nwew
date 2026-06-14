@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0A0809" />
+<title>Holy Burgers — The authentic smash burger</title>
+<meta name="description" content="Smash smash smash. Two-patty smash burgers, House Holy sauce, and crispy fried onions. Order in three taps." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
+
+<style>
+/* ============================================================
+   HOLY BURGERS — demo digital menu.
+   Image-first, craving-driven. Pure CSS + vanilla JS.
+   Built to the RestoSoftware spec: dish first, price second.
+   ============================================================ */
+
+:root{
+  --bg-0:#0A0809;
+  --bg-1:#111012;
+  --bg-2:#17151a;
+
+  --flame-1:#FF6A1A;   /* sear orange */
+  --flame-2:#FFB020;   /* toasted gold */
+  --char:#E11D2E;      /* ketchup red */
+
+  --text:#FAF7F2;
+  --muted:#9C968E;
+
+  --glass:rgba(255,255,255,0.045);
+  --line:rgba(255,255,255,0.09);
+
+  --mx:clamp(20px, 5vw, 96px);
+  --ease:cubic-bezier(.22,.61,.36,1);
+  --ease-out:cubic-bezier(.16,1,.3,1);
+
+  --grad:linear-gradient(100deg, var(--char), var(--flame-1) 55%, var(--flame-2));
+}
+
+*{ box-sizing:border-box; }
+
+html{
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  text-rendering:optimizeLegibility;
+  scroll-behavior:smooth;
+}
+
+body{
+  margin:0;
+  background:var(--bg-1);
+  color:var(--text);
+  font-family:"Inter", system-ui, sans-serif;
+  font-size:16px;
+  line-height:1.6;
+  overflow-x:hidden;
+  -webkit-tap-highlight-color:transparent;
+  padding-bottom:96px;            /* room for the sticky order bar */
+}
+
+body::before{
+  content:"";
+  position:fixed; inset:0; z-index:-3;
+  background:
+    radial-gradient(120% 70% at 50% -10%, #1c140f 0%, transparent 58%),
+    radial-gradient(90% 90% at 90% 110%, #1a0f12 0%, transparent 55%),
+    linear-gradient(180deg, var(--bg-0), var(--bg-1));
+}
+
+a{ color:inherit; text-decoration:none; }
+
+.display{
+  font-family:"Anton", system-ui, sans-serif;
+  font-weight:400;
+  letter-spacing:.01em;
+  text-transform:uppercase;
+  line-height:.92;
+}
+.mono{ font-family:"JetBrains Mono", ui-monospace, monospace; }
+
+.label{
+  font-family:"JetBrains Mono", monospace;
+  font-weight:500;
+  font-size:11px;
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+
+.grad-text{
+  background:var(--grad);
+  -webkit-background-clip:text; background-clip:text;
+  color:transparent;
+}
+
+.wrap{ padding-inline:var(--mx); }
+
+/* ============================================================
+   NAV
+   ============================================================ */
+.nav{
+  position:sticky; top:0; z-index:50;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px var(--mx);
+  background:rgba(10,8,9,.72);
+  backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--line);
+}
+.brand{ display:flex; align-items:center; gap:11px; }
+.brand__mark{
+  width:34px; height:34px; border-radius:9px; flex:none;
+  display:grid; place-items:center;
+  background:var(--grad);
+  box-shadow:0 6px 22px -8px rgba(255,106,26,.7);
+  font-size:18px;
+}
+.brand__name{
+  font-family:"Anton", sans-serif; text-transform:uppercase;
+  font-size:20px; letter-spacing:.04em; line-height:1;
+}
+.nav__tag{ display:none; }
+@media (min-width:720px){ .nav__tag{ display:inline; } }
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{
+  position:relative;
+  padding-block:clamp(54px,11vh,120px) clamp(40px,7vh,70px);
+  text-align:center;
+}
+.hero__glow{
+  position:absolute; z-index:-1; top:-6%; left:50%;
+  width:min(760px,110vw); height:min(520px,70vh);
+  transform:translateX(-50%);
+  background:radial-gradient(circle at 50% 40%, rgba(255,106,26,.30), rgba(225,29,46,.12) 45%, transparent 70%);
+  filter:blur(36px); pointer-events:none;
+}
+.hero__eyebrow{
+  display:inline-flex; align-items:center; gap:9px;
+  margin-bottom:22px;
+}
+.hero__eyebrow .dot{
+  width:7px; height:7px; border-radius:50%; background:var(--flame-1);
+  box-shadow:0 0 0 0 rgba(255,106,26,.55);
+  animation:pulse 2.4s ease-out infinite;
+}
+@keyframes pulse{
+  0%{ box-shadow:0 0 0 0 rgba(255,106,26,.55); }
+  70%{ box-shadow:0 0 0 9px rgba(255,106,26,0); }
+  100%{ box-shadow:0 0 0 0 rgba(255,106,26,0); }
+}
+.hero__head{
+  margin:0 auto;
+  font-size:clamp(54px, 13vw, 150px);
+  max-width:11ch;
+}
+.hero__sub{
+  margin:24px auto 0; max-width:46ch;
+  color:var(--muted); font-size:clamp(15px,2.2vw,18px);
+}
+.hero__sub strong{ color:var(--text); font-weight:600; }
+.hero__smash{
+  margin-top:18px;
+  font-family:"JetBrains Mono",monospace; font-size:12px; letter-spacing:.42em;
+  text-transform:uppercase; color:var(--flame-2); opacity:.9;
+}
+
+/* ============================================================
+   MENU
+   ============================================================ */
+.menu{ padding-block:clamp(20px,5vh,48px) clamp(40px,9vh,90px); }
+.menu__head{
+  display:flex; align-items:flex-end; justify-content:space-between;
+  gap:24px; margin-bottom:30px;
+  border-bottom:1px solid var(--line); padding-bottom:18px;
+}
+.menu__title{ margin:0; font-size:clamp(26px,4vw,40px); }
+.menu__count{ flex:none; }
+
+.menu__grid{
+  display:grid; gap:clamp(20px,2.4vw,30px);
+  grid-template-columns:repeat(auto-fit, minmax(290px, 1fr));
+}
+
+.dish{
+  position:relative;
+  display:flex; flex-direction:column;
+  border-radius:22px; overflow:hidden;
+  background:var(--glass);
+  border:1px solid var(--line);
+  box-shadow:0 30px 70px -40px rgba(0,0,0,.95);
+  transition:transform .4s var(--ease-out), box-shadow .4s var(--ease-out), border-color .4s var(--ease);
+}
+.dish:hover{
+  transform:translateY(-6px);
+  border-color:rgba(255,176,32,.35);
+  box-shadow:0 40px 80px -36px rgba(0,0,0,1), 0 0 50px -18px rgba(255,106,26,.45);
+}
+.dish__media{
+  position:relative; aspect-ratio:4/3; overflow:hidden;
+  background:linear-gradient(160deg,#1d1418,#100c10);
+}
+.dish__media img{
+  width:100%; height:100%; object-fit:cover; display:block;
+  transform:scale(1.02);
+  transition:transform 1.1s var(--ease-out);
+}
+.dish:hover .dish__media img{ transform:scale(1.09); }
+.dish__media::after{
+  content:""; position:absolute; inset:0;
+  background:linear-gradient(180deg, transparent 52%, rgba(10,8,9,.78));
+}
+.dish__badge{
+  position:absolute; top:14px; left:14px; z-index:2;
+  display:inline-flex; align-items:center; gap:6px;
+  padding:7px 12px; border-radius:999px;
+  background:rgba(10,8,9,.6); backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.14);
+  font-family:"JetBrains Mono",monospace; font-size:10.5px; letter-spacing:.14em;
+  text-transform:uppercase;
+}
+.dish__badge--hot{ background:var(--grad); border-color:transparent; color:#1a0a05; font-weight:600; }
+.dish__kcal{
+  position:absolute; right:14px; bottom:14px; z-index:2;
+}
+
+.dish__body{
+  display:flex; flex-direction:column; gap:12px;
+  padding:22px 22px 24px;
+}
+.dish__top{ display:flex; align-items:baseline; justify-content:space-between; gap:14px; }
+.dish__name{
+  margin:0; font-family:"Anton",sans-serif; text-transform:uppercase;
+  font-size:24px; letter-spacing:.02em; line-height:1;
+}
+.dish__price{
+  flex:none; font-family:"JetBrains Mono",monospace; font-weight:500;
+  font-size:18px; color:var(--flame-2);
+}
+.dish__desc{ margin:0; color:var(--muted); font-size:14.5px; line-height:1.55; }
+
+.dish__add{
+  margin-top:6px;
+  display:inline-flex; align-items:center; justify-content:center; gap:9px;
+  width:100%; min-height:50px; padding:0 22px;
+  border:none; border-radius:999px; cursor:pointer;
+  font-family:"Inter",sans-serif; font-weight:700; font-size:15px;
+  color:#1a0a05; background:var(--grad); background-size:160% 160%;
+  box-shadow:0 10px 30px -12px rgba(255,106,26,.6);
+  transition:transform .25s var(--ease-out), box-shadow .25s var(--ease-out), filter .25s;
+}
+.dish__add:hover{ transform:translateY(-2px); box-shadow:0 16px 40px -12px rgba(255,106,26,.8); }
+.dish__add:active{ transform:translateY(0) scale(.98); }
+.dish__add svg{ width:18px; height:18px; }
+.dish__add.is-added{ filter:saturate(.4) brightness(.9); }
+
+/* ============================================================
+   STICKY ORDER BAR
+   ============================================================ */
+.orderbar{
+  position:fixed; left:0; right:0; bottom:0; z-index:60;
+  display:flex; align-items:center; justify-content:space-between;
+  gap:16px; padding:14px var(--mx);
+  background:rgba(13,10,12,.82);
+  backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+  border-top:1px solid var(--line);
+  transform:translateY(120%);
+  transition:transform .5s var(--ease-out);
+}
+.orderbar.is-on{ transform:translateY(0); }
+.orderbar__info{ display:flex; flex-direction:column; line-height:1.25; }
+.orderbar__count{ font-size:13px; color:var(--muted); }
+.orderbar__total{ font-family:"Anton",sans-serif; font-size:26px; letter-spacing:.02em; }
+.orderbar__btn{
+  display:inline-flex; align-items:center; gap:10px;
+  min-height:54px; padding:0 28px;
+  border:none; border-radius:999px; cursor:pointer;
+  font-family:"Inter",sans-serif; font-weight:700; font-size:16px;
+  color:#1a0a05; background:var(--grad);
+  box-shadow:0 10px 34px -10px rgba(255,106,26,.7);
+  transition:transform .25s var(--ease-out);
+}
+.orderbar__btn:hover{ transform:translateY(-2px); }
+.orderbar__btn .arrow{ transition:transform .25s var(--ease-out); }
+.orderbar__btn:hover .arrow{ transform:translateX(4px); }
+
+/* little pop when total changes */
+@keyframes pop{ 0%{ transform:scale(1); } 40%{ transform:scale(1.16); } 100%{ transform:scale(1); } }
+.orderbar__total.pop{ animation:pop .35s var(--ease-out); }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.foot{
+  text-align:center; padding:46px var(--mx) 60px;
+  border-top:1px solid var(--line); color:var(--muted);
+}
+.foot a{ color:var(--flame-2); }
+.foot p{ margin:6px 0; }
+
+/* ============================================================
+   Reveal
+   ============================================================ */
+html.js [data-reveal]{ opacity:0; transform:translateY(26px); }
+html.js [data-reveal].is-in{
+  opacity:1; transform:none;
+  transition:opacity .7s var(--ease-out), transform .7s var(--ease-out);
+  transition-delay:var(--d,0ms);
+}
+
+@media (prefers-reduced-motion:reduce){
+  html{ scroll-behavior:auto; }
+  *{ animation:none !important; }
+  html.js [data-reveal]{ opacity:1 !important; transform:none !important; transition:none !important; }
+  .dish:hover{ transform:none; }
+}
+
+::selection{ background:var(--flame-1); color:#1a0a05; }
+:focus-visible{ outline:2px solid var(--flame-2); outline-offset:3px; border-radius:6px; }
+</style>
+</head>
+
+<body>
+
+<!-- ============ NAV ============ -->
+<nav class="nav">
+  <a class="brand" href="#" aria-label="Holy Burgers home">
+    <span class="brand__mark" aria-hidden="true">🔥</span>
+    <span class="brand__name">Holy Burgers</span>
+  </a>
+  <span class="nav__tag label">Smash · Smash · Smash</span>
+</nav>
+
+<main>
+
+  <!-- ============ HERO ============ -->
+  <header class="hero wrap">
+    <div class="hero__glow" aria-hidden="true"></div>
+    <p class="hero__eyebrow label" data-reveal><span class="dot" aria-hidden="true"></span> Quebec · Since 2019</p>
+    <h1 class="hero__head display" data-reveal style="--d:.06s">
+      The authentic <span class="grad-text">smash</span> burger
+    </h1>
+    <p class="hero__sub" data-reveal style="--d:.16s">
+      Certified Canadian beef, smashed thin on a screaming-hot flat-top for that
+      lacy crispy edge. <strong>House Holy sauce on every one.</strong>
+    </p>
+    <p class="hero__smash" data-reveal style="--d:.24s">Smash smash smash</p>
+  </header>
+
+  <!-- ============ MENU ============ -->
+  <section class="menu wrap" aria-label="Burger menu">
+    <div class="menu__head" data-reveal>
+      <h2 class="menu__title display">The Burgers</h2>
+      <span class="menu__count label">03 / Signatures</span>
+    </div>
+
+    <div class="menu__grid">
+
+      <!-- 1 -->
+      <article class="dish" data-reveal data-name="Big Smash" data-price="11.95">
+        <div class="dish__media">
+          <img src="https://holyburgers.ca/wp-content/uploads/2024/05/1-burger_big-smash.jpg"
+               alt="Big Smash — two spiced beef patties with crispy fried onions and pickles" loading="eager" />
+          <span class="dish__badge dish__badge--hot">★ Most loved</span>
+        </div>
+        <div class="dish__body">
+          <div class="dish__top">
+            <h3 class="dish__name">Big Smash</h3>
+            <span class="dish__price">$11.95</span>
+          </div>
+          <p class="dish__desc">
+            Two spiced beef patties smashed to crispy perfection, crispy fried onions,
+            pickles, and house Big Smash sauce.
+          </p>
+          <button class="dish__add" type="button" aria-label="Add Big Smash to order">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+            <span class="dish__add-label">Add to order</span>
+          </button>
+        </div>
+      </article>
+
+      <!-- 2 -->
+      <article class="dish" data-reveal style="--d:.08s" data-name="Double Trouble" data-price="14.50">
+        <div class="dish__media">
+          <img src="https://holyburgers.ca/wp-content/uploads/2024/05/2-burger_double-trouble.jpg"
+               alt="Double Trouble — two patties with bacon, melted cheese, lettuce and tomato" loading="lazy" />
+          <span class="dish__badge">Loaded</span>
+        </div>
+        <div class="dish__body">
+          <div class="dish__top">
+            <h3 class="dish__name">Double Trouble</h3>
+            <span class="dish__price">$14.50</span>
+          </div>
+          <p class="dish__desc">
+            Two juicy patties, Holy sauce, fried onions, smoked bacon, melted cheese,
+            crisp lettuce and tomatoes.
+          </p>
+          <button class="dish__add" type="button" aria-label="Add Double Trouble to order">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+            <span class="dish__add-label">Add to order</span>
+          </button>
+        </div>
+      </article>
+
+      <!-- 3 -->
+      <article class="dish" data-reveal style="--d:.16s" data-name="Holy One" data-price="15.95">
+        <div class="dish__media">
+          <img src="https://holyburgers.ca/wp-content/uploads/2024/05/3-burger_holy-one.jpg"
+               alt="Holy One — sweet and salty burger with a crispy onion ring and bacon" loading="lazy" />
+          <span class="dish__badge">Sweet &amp; salty</span>
+        </div>
+        <div class="dish__body">
+          <div class="dish__top">
+            <h3 class="dish__name">Holy One</h3>
+            <span class="dish__price">$15.95</span>
+          </div>
+          <p class="dish__desc">
+            Sweet-meets-salty: ketchup and honey glaze, a crispy onion ring, smoked bacon,
+            melted cheese and lettuce.
+          </p>
+          <button class="dish__add" type="button" aria-label="Add Holy One to order">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+            <span class="dish__add-label">Add to order</span>
+          </button>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="foot">
+  <p class="brand__name display" style="font-size:22px;">Holy Burgers</p>
+  <p class="label">Pyramide Ste-Foy · Trois-Rivières · Sherbrooke · Saint-Nicolas</p>
+  <p>(418) 686-0069 · <a href="mailto:info@holyburgers.ca">info@holyburgers.ca</a></p>
+  <p class="label" style="opacity:.5; margin-top:14px;">Demo menu · Built by RestoSoftware</p>
+</footer>
+
+<!-- ============ STICKY ORDER BAR ============ -->
+<div class="orderbar" id="orderbar" role="region" aria-label="Your order">
+  <div class="orderbar__info">
+    <span class="orderbar__count" id="orderCount">0 items</span>
+    <span class="orderbar__total" id="orderTotal">$0.00</span>
+  </div>
+  <button class="orderbar__btn" type="button" id="checkout">
+    <span>Checkout</span>
+    <svg class="arrow" width="24" height="11" viewBox="0 0 26 11" fill="none" aria-hidden="true"><path d="M0 5.5h22M18 1l4.5 4.5L18 10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var doc = document.documentElement;
+  doc.classList.add("js");
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---- Reveal on scroll ---- */
+  var reveals = document.querySelectorAll("[data-reveal]");
+  if (reduce || !("IntersectionObserver" in window)){
+    reveals.forEach(function(el){ el.classList.add("is-in"); });
+  } else {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if (e.isIntersecting){ e.target.classList.add("is-in"); io.unobserve(e.target); }
+      });
+    }, { threshold:0.18, rootMargin:"0px 0px -6% 0px" });
+    reveals.forEach(function(el){ io.observe(el); });
+  }
+
+  /* ---- Order state ---- */
+  var order = {};           /* name -> { price, qty } */
+  var bar     = document.getElementById("orderbar");
+  var elCount = document.getElementById("orderCount");
+  var elTotal = document.getElementById("orderTotal");
+
+  function render(){
+    var items = 0, total = 0;
+    Object.keys(order).forEach(function(k){
+      items += order[k].qty;
+      total += order[k].qty * order[k].price;
+    });
+    elCount.textContent = items + (items === 1 ? " item" : " items");
+    elTotal.textContent = "$" + total.toFixed(2);
+    bar.classList.toggle("is-on", items > 0);
+    if (!reduce){
+      elTotal.classList.remove("pop");
+      void elTotal.offsetWidth;        /* restart animation */
+      elTotal.classList.add("pop");
+    }
+  }
+
+  document.querySelectorAll(".dish").forEach(function(card){
+    var name  = card.getAttribute("data-name");
+    var price = parseFloat(card.getAttribute("data-price"));
+    var btn   = card.querySelector(".dish__add");
+    var lbl   = btn.querySelector(".dish__add-label");
+    var reset = null;
+
+    btn.addEventListener("click", function(){
+      if (!order[name]) order[name] = { price: price, qty: 0 };
+      order[name].qty += 1;
+      render();
+
+      lbl.textContent = "Added ×" + order[name].qty;
+      btn.classList.add("is-added");
+      clearTimeout(reset);
+      reset = setTimeout(function(){
+        lbl.textContent = "Add to order";
+        btn.classList.remove("is-added");
+      }, 1400);
+    });
+  });
+
+  document.getElementById("checkout").addEventListener("click", function(){
+    var items = Object.keys(order).reduce(function(n,k){ return n + order[k].qty; }, 0);
+    if (!items) return;
+    var total = elTotal.textContent;
+    var lines = Object.keys(order).map(function(k){ return order[k].qty + "× " + k; }).join(", ");
+    alert("Your order (" + total + "):\n" + lines + "\n\nThis is a demo — checkout isn't wired up.");
+  });
+})();
+</script>
+</body>
+</html>
